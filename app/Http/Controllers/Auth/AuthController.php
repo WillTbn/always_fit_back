@@ -3,12 +3,67 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Service\Auth\AuthService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthController extends Controller
 {
-    public function auth()
+    /**
+     * Handle the incoming request to authenticate a user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function auth(LoginRequest $request)
     {
+        $authService = new AuthService(
+            $request->input('email'),
+            $request->input('password')
+        );
+        $authService->execute();
 
+        return new JsonResponse([
+            'success' => true,
+            'message' => 'Login efetuado com sucesso.',
+            'token' => $authService->getToken()
+        ], 200);
+
+    }
+
+    public function logout(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if ($user) {
+            PersonalAccessToken::where('tokenable_id', $user->id)
+                ->where('tokenable_type', 'App\Models\User')
+                ->delete();
+        }
+
+        return new JsonResponse([
+            'success' => true,
+            'message' => 'Logout efetuado com sucesso.'
+        ], 200);
+    }
+
+    public function validateToken(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Token inválido ou expirado.'
+            ], 401);
+        }
+        // dd($user);
+        return new JsonResponse([
+            'success' => true,
+            'message' => 'Token válido.',
+            'user' => $user
+        ], 200);
     }
 }
