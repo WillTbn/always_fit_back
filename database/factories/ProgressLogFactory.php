@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Vinkla\Hashids\Facades\Hashids;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ProgressLog>
@@ -17,7 +18,7 @@ class ProgressLogFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+           'hash_id' => Hashids::encode($this->faker->unique()->numberBetween(1, 1000)),
         ];
     }
 }

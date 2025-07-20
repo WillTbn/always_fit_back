@@ -57,11 +57,14 @@ class AuthController extends Controller
 
         if (!$user) {
             return new JsonResponse([
-                'success' => false,
-                'message' => 'Token inválido ou expirado.'
+            'success' => false,
+            'message' => 'Token inválido ou expirado.'
             ], 401);
         }
-        // dd($user);
+
+        // Carrega as relações do Model, por exemplo: 'profile', 'roles'
+        $user->load(['progressLog.training']); // ajuste os nomes das relações conforme seu Model
+
         return new JsonResponse([
             'success' => true,
             'message' => 'Token válido.',
