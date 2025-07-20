@@ -11,6 +11,7 @@ Route::controller(AuthController::class)
     ->as('auth.')
     ->group(function () {
         Route::post('/', 'auth')->name('login');
+        Route::post('/register', 'register')->name('register');
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth:sanctum');
         Route::get('/validate-token', [AuthController::class, 'validateToken'])->name('validateToken')->middleware('auth:sanctum');
     });

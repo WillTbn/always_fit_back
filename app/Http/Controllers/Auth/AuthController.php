@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisteRequest;
 use App\Service\Auth\AuthService;
+use App\Service\Auth\RegisteService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -65,5 +67,22 @@ class AuthController extends Controller
             'message' => 'Token válido.',
             'user' => $user
         ], 200);
+    }
+
+    public function register(RegisteRequest $request): JsonResponse
+    {
+        $registerService = new RegisteService(
+            $request->input('name'),
+            $request->input('email'),
+            $request->input('password')
+        );
+
+        $user = $registerService->execute();
+
+        return new JsonResponse([
+            'success' => true,
+            'message' => 'Usuário registrado, com sucesso.',
+            'user' => $registerService->getUser()
+        ], 201);
     }
 }

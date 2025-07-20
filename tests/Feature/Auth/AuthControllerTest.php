@@ -223,4 +223,48 @@ class AuthControllerTest extends TestCase
                 ]
             ]);
     }
+
+    public function test_register_user_success()
+    {
+        $response = $this->postJson('/api/auth/register', [
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123'
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJson([
+                'success' => true,
+                'message' => 'Usuário registrado, com sucesso.',
+                'user' => [
+                    'name' => 'Test User',
+                    'email' => 'test@example.com',
+                ]
+            ]);
+        $this->assertDatabaseHas('users', [
+            'email' => 'test@example.com'
+        ]);
+    }
+
+    public function test_register_user_validation()
+    {
+        $response = $this->postJson('/api/auth/register', [
+            'name' => '',
+            'email' => 'invalid-email',
+            'password' => 'short',
+            'password_confirmation' => 'notmatching'
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'O campo nome é obrigatório. (and 3 more errors)'
+            ])
+            ->assertJsonValidationErrors([
+                'name',
+                'email',
+                'password',
+            ]);
+    }
+
 }
